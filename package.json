@@ -21,6 +21,7 @@
     "prettier": "^3.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.1",
     "viem": "^2.21.55",
     "wagmi": "^2.14.3"
   },

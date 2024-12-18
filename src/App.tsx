@@ -4,7 +4,7 @@ import { config } from "./config";
 
 import "./App.css";
 import "@rainbow-me/rainbowkit/styles.css";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import Home from "./pages/Home";
 import AppLayout from "./components/AppLayout";
 
@@ -14,7 +14,13 @@ function App() {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider modalSize="compact">
+        <RainbowKitProvider
+          theme={lightTheme({
+            accentColor: "#4A00FF",
+            accentColorForeground: "#fff",
+          })}
+          modalSize="compact"
+        >
           <AppLayout>
             <Home />
           </AppLayout>
