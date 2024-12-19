@@ -1,8 +1,8 @@
-import { useAccount, useTransactionReceipt } from "wagmi";
+import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useForm } from "react-hook-form";
 import { moves } from "../utils/constants";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { keccak256, parseUnits, encodePacked, toHex } from "viem";
 import { config } from "../config";
 import secureLocalStorage from "react-secure-storage";
@@ -13,6 +13,7 @@ import { signMessage } from "@wagmi/core";
 import { generateSalt } from "../utils";
 import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS"; // Adjust the import path as needed
 import GameStatus from "../components/GameStatus";
+import TransactionStatus from "../components/TransactionStatus";
 
 type CreateGameForm = {
   move: number;
@@ -220,39 +221,17 @@ const Create = () => {
         </button>
       </form>
       {txnHash ? (
-        <TransactionStatus txn={txnHash} setTxnHash={setTxnHash} />
+        <TransactionStatus
+          txnHash={txnHash}
+          onSuccess={(receipt) => {
+            if (receipt?.contractAddress) {
+              secureLocalStorage.setItem("RPSAddress", receipt.contractAddress);
+              setTxnHash(null);
+            }
+          }}
+          className="mt-4"
+        />
       ) : null}
-    </div>
-  );
-};
-
-const TransactionStatus = ({
-  txn,
-  setTxnHash,
-}: {
-  txn: `0x${string}`;
-  setTxnHash: Dispatch<SetStateAction<`0x${string}` | null>>;
-}) => {
-  const { chain } = useAccount();
-  const { data: receipt } = useTransactionReceipt({ hash: txn });
-
-  useEffect(() => {
-    if (receipt && receipt?.contractAddress) {
-      secureLocalStorage.setItem("RPSAddress", receipt.contractAddress);
-      setTxnHash(null);
-    }
-  }, [receipt, setTxnHash]);
-
-  return (
-    <div>
-      <a
-        className="mt-4 link link-primary"
-        href={`https://${chain?.name}.etherscan.io/tx/${txn}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Track Transaction
-      </a>
     </div>
   );
 };

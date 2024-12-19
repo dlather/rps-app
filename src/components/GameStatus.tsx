@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAccount, useReadContracts, useWriteContract } from "wagmi";
 import { RPSAbi } from "../utils/contracts/RPS";
 import { formatUnits } from "viem";
+import TransactionStatus from "./TransactionStatus";
+import secureLocalStorage from "react-secure-storage";
 const possibleMoves = [
   "Waiting...",
   "Rock",
@@ -17,6 +19,7 @@ type GameStatusProps = {
 const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
   const { chain } = useAccount();
   const { writeContractAsync } = useWriteContract();
+  const [txnHash, setTxnHash] = useState<`0x${string}` | null>(null);
   const gameContract = {
     address: gameAddress,
     abi: RPSAbi,
@@ -94,6 +97,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
       functionName: "j2Timeout",
     });
     console.log(tx);
+    setTxnHash(tx);
   };
 
   return (
@@ -152,6 +156,17 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
             <div className="btn btn-primary" onClick={handleGetStakeBack}>
               Get Stake back
             </div>
+          )}
+
+          {txnHash && (
+            <TransactionStatus
+              txnHash={txnHash}
+              onSuccess={() => {
+                secureLocalStorage.removeItem("RPSAddress");
+                secureLocalStorage.removeItem("createGameConfig");
+                setTxnHash(null);
+              }}
+            />
           )}
         </div>
       )}
