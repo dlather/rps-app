@@ -5,6 +5,7 @@ import { LOCAL_STORAGE_KEYS, moves } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { keccak256, parseUnits, encodePacked, toHex } from "viem";
 import { config } from "../config";
+import { toast } from "react-toastify";
 import secureLocalStorage from "react-secure-storage";
 import { encryptSalt, uint8ArrayToBigInt } from "../utils";
 import { deriveKey } from "../utils";
@@ -12,8 +13,8 @@ import { useDeployContract } from "wagmi";
 import { signMessage } from "@wagmi/core";
 import { generateSalt } from "../utils";
 import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS"; // Adjust the import path as needed
-import GameStatus from "../components/GameStatus";
 import TransactionStatus from "../components/TransactionStatus";
+import { useNavigate } from "react-router-dom";
 
 type CreateGameForm = {
   move: number;
@@ -25,6 +26,7 @@ type CreateGameForm = {
 const Create = () => {
   const { isDisconnected, address: p1Address } = useAccount();
   const { deployContractAsync } = useDeployContract();
+  const navigate = useNavigate();
 
   const [txnHash, setTxnHash] = useState<`0x${string}` | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +36,7 @@ const Create = () => {
 
   useEffect(() => {
     const gameAddress = secureLocalStorage.getItem(
-      LOCAL_STORAGE_KEYS.RPS_ADDRESS
+      LOCAL_STORAGE_KEYS.CREATED_RPS_ADDRESS
     );
     if (gameAddress) {
       setCurrentGameAddress(gameAddress as `0x${string}`);
@@ -131,7 +133,9 @@ const Create = () => {
   if (isDisconnected)
     return (
       <div className="flex flex-col items-center justify-center my-20">
-        <div className="text-lg mb-4">Please connect your wallet</div>
+        <div className="text-lg mb-4 text-white">
+          Please connect your wallet
+        </div>
         <ConnectButton />
       </div>
     );
@@ -139,113 +143,160 @@ const Create = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center max-w-lg mx-auto h-screen ">
-        <span className="loading loading-spinner loading-lg"></span>
+        <span className="loading loading-spinner loading-lg text-white"></span>
       </div>
     );
   }
 
-  if (currentGameAddress) {
-    return (
-      <GameStatus
-        gameAddress={currentGameAddress}
-        setCurrentGameAddress={setCurrentGameAddress}
-      />
-    );
-  }
+  //   if (currentGameAddress) {
+  //     return (
+  //       <GameStatus
+  //         gameAddress={currentGameAddress}
+  //         setCurrentGameAddress={setCurrentGameAddress}
+  //       />
+  //     );
+  //   }
 
   return (
     <div>
-      <form
-        className="flex flex-col items-center justify-center my-20"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <p className="mt-6 mb-1 text-gray-500">Choose your move</p>
-        <div className="flex justify-center my-2 gap-4 w-full">
-          {moves.map((m, i) => (
-            <kbd
-              key={i}
+      {currentGameAddress ? (
+        <div className="flex flex-col items-center justify-center my-20">
+          <h1 className="text-4xl font-bold text-white mb-8">
+            Game created successfully
+          </h1>
+          <div className="flex items-center justify-center gap-4">
+            <button
+              className="btn btn-primary "
               onClick={() => {
-                setValue("move", i);
+                navigator.clipboard.writeText(
+                  `${window.location.origin}/join/${currentGameAddress}`
+                );
+                toast.success("Invite link copied to clipboard");
               }}
-              className={`kbd cursor-pointer ${selectedMove === i ? "bg-primary text-white" : null}`}
             >
-              {m}
-            </kbd>
-          ))}
+              Copy Invite Link
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate(`/join/${currentGameAddress}`)}
+            >
+              Go to game
+            </button>
+            <button
+              className="btn btn-error"
+              onClick={() => {
+                secureLocalStorage.removeItem(
+                  LOCAL_STORAGE_KEYS.CREATED_RPS_ADDRESS
+                );
+                setCurrentGameAddress(null);
+                navigate("/");
+              }}
+            >
+              Delete Game
+            </button>
+          </div>
+          <span className="text-white mt-4">
+            Game Address: {currentGameAddress}
+          </span>
         </div>
-        <div className=" my-4">
-          <label className="input input-bordered flex items-center w-96">
-            <input
-              type="number"
-              {...register("stake", {
-                valueAsNumber: true,
-                required: true,
-                min: 1,
-              })}
-              className="grow"
-              placeholder="Enter Amount"
-            />
-            <kbd className="">wei</kbd>
-          </label>
+      ) : txnHash ? (
+        <div className="flex flex-col items-center justify-center my-20">
+          <span className="loading loading-spinner loading-lg text-white"></span>
+          <TransactionStatus
+            txnHash={txnHash}
+            onSuccess={(receipt) => {
+              if (receipt?.contractAddress) {
+                const gameAddress = receipt.contractAddress;
+                secureLocalStorage.setItem(
+                  LOCAL_STORAGE_KEYS.CREATED_RPS_ADDRESS,
+                  gameAddress
+                );
+                setTxnHash(null);
+                setCurrentGameAddress(gameAddress);
+              }
+            }}
+            className="mt-4"
+          />
         </div>
-        <div className="my-4">
-          <label className="input input-bordered flex items-center w-96">
-            <input
-              type="text"
-              {...register("player2", {
-                required: true,
-                minLength: 42,
-                maxLength: 42,
-                pattern: /^0x[a-fA-F0-9]{40}$/,
-              })}
-              className="grow"
-              placeholder="Player 2 Address"
-            />
-            <div className="label">
-              {errors.player2 && (
-                <span className="label-text-alt text-red-600">
-                  Invalid Address
-                </span>
-              )}
-            </div>
-          </label>
-        </div>
-        <div className=" my-4">
-          <label className="input input-bordered flex items-center w-96">
-            <input
-              type="text"
-              {...register("pwd", { required: true })}
-              className="grow"
-              placeholder="Password"
-            />
-            <kbd className="">🔑</kbd>
-          </label>
-        </div>
-        <button
-          disabled={!isValid}
-          className="btn btn-primary mt-4 w-96"
-          type="submit"
+      ) : (
+        <form
+          className="flex flex-col items-center justify-center my-20"
+          onSubmit={handleSubmit(onSubmit)}
         >
-          Create Game
-        </button>
-      </form>
-      {txnHash ? (
-        <TransactionStatus
-          txnHash={txnHash}
-          onSuccess={(receipt) => {
-            if (receipt?.contractAddress) {
-              const gameAddress = receipt.contractAddress;
-              secureLocalStorage.setItem(
-                LOCAL_STORAGE_KEYS.RPS_ADDRESS,
-                gameAddress
-              );
-              setTxnHash(null);
-              setCurrentGameAddress(gameAddress);
-            }
-          }}
-          className="mt-4"
-        />
-      ) : null}
+          <h1 className="text-4xl font-bold text-white mb-8">
+            Create a new game
+          </h1>
+          <p className="mt-6 mb-1 text-white">Choose your move</p>
+          <div className="flex justify-center my-2 gap-4 w-full">
+            {moves.map((m, i) => (
+              <kbd
+                key={i}
+                onClick={() => {
+                  setValue("move", i);
+                }}
+                className={`kbd cursor-pointer ${selectedMove === i ? "bg-primary text-white" : null}`}
+              >
+                {m}
+              </kbd>
+            ))}
+          </div>
+          <div className=" my-4">
+            <label className="input input-bordered flex items-center w-96">
+              <input
+                type="number"
+                {...register("stake", {
+                  valueAsNumber: true,
+                  required: true,
+                  min: 1,
+                })}
+                className="grow"
+                placeholder="Enter Amount"
+              />
+              <kbd className="">wei</kbd>
+            </label>
+          </div>
+          <div className="my-4">
+            <label className="input input-bordered flex items-center w-96">
+              <input
+                type="text"
+                {...register("player2", {
+                  required: true,
+                  minLength: 42,
+                  maxLength: 42,
+                  pattern: /^0x[a-fA-F0-9]{40}$/,
+                })}
+                className="grow"
+                placeholder="Player 2 Address"
+              />
+              <div className="label">
+                {errors.player2 && (
+                  <span className="label-text-alt text-red-600">
+                    Invalid Address
+                  </span>
+                )}
+              </div>
+            </label>
+          </div>
+          <div className=" my-4">
+            <label className="input input-bordered flex items-center w-96">
+              <input
+                type="text"
+                {...register("pwd", { required: true })}
+                className="grow"
+                placeholder="Password"
+              />
+              <kbd className="">🔑</kbd>
+            </label>
+          </div>
+          <button
+            disabled={!isValid}
+            className="btn btn-primary mt-4 w-96"
+            type="submit"
+          >
+            Create Game
+          </button>
+        </form>
+      )}
     </div>
   );
 };

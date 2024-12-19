@@ -25,7 +25,7 @@ const TransactionStatus = ({
   return (
     <div className={className}>
       <a
-        className="mt-4 link link-primary"
+        className="mt-4 link text-white"
         href={`https://${chain?.name}.etherscan.io/tx/${txnHash}`}
         target="_blank"
         rel="noreferrer"

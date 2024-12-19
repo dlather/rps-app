@@ -6,6 +6,7 @@ import useDialogControl from "../utils/hooks/useDialogControl";
 import useChainConnection from "../utils/hooks/useChainConnection";
 import { WrongChainDialog } from "./Dialogs";
 import { NetworkStatusDialog } from "./Dialogs";
+import { ToastContainer } from "react-toastify";
 import { holesky } from "viem/chains";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
@@ -32,9 +33,12 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <ConnectButton />
         </div>
       </div>
-      {children}
+      <div className="min-h-screen bg-gradient-to-r from-blue-400 to-indigo-400 flex flex-col items-center justify-center p-4">
+        {children}
+      </div>
       <NetworkStatusDialog />
       <WrongChainDialog onSwitch={handleSwitchChain} network={holesky.name} />
+      <ToastContainer />
     </div>
   );
 };

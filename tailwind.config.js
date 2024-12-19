@@ -11,7 +11,6 @@ export default {
         light: {
           ...require("daisyui/src/theming/themes")["light"],
           primary: "#4F45E4",
-          "primary-content": "#fff",
         },
       },
     ],

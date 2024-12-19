@@ -5,7 +5,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 flex flex-col items-center justify-center p-4">
+    <div>
       <h1 className="text-4xl font-bold text-white mb-12">
         Welcome to the RPS Game Portal
       </h1>
@@ -15,7 +15,7 @@ const Home = () => {
             <FaPlus className="text-indigo-500 w-12 h-12 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold mb-4">Create Game</h2>
             <p className="text-gray-600 mb-6">
-              Start a new game session and invite your friends to join.
+              Start a new game session and invite your friend to join.
             </p>
             <button
               className="w-full bg-indigo-500 text-white py-2 rounded-md hover:bg-indigo-600 transition-colors duration-300 flex items-center justify-center"
