@@ -1,6 +1,6 @@
 import { useAccount, useTransactionReceipt } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { moves } from "../utils/constants";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { keccak256, parseUnits, encodePacked, toHex } from "viem";
@@ -12,6 +12,7 @@ import { useDeployContract } from "wagmi";
 import { signMessage } from "@wagmi/core";
 import { generateSalt } from "../utils";
 import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS"; // Adjust the import path as needed
+import GameStatus from "../components/GameStatus";
 
 type CreateGameForm = {
   move: number;
@@ -139,12 +140,7 @@ const Create = () => {
   }
 
   if (currentGameAddress) {
-    return (
-      <div className="flex flex-col items-center justify-center my-20">
-        <div className="text-lg mb-4">Game Created</div>
-        <div className="text-lg mb-4">{currentGameAddress}</div>
-      </div>
-    );
+    return <GameStatus gameAddress={currentGameAddress} />;
   }
 
   return (
