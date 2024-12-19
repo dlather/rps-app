@@ -1,7 +1,7 @@
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useForm } from "react-hook-form";
-import { moves } from "../utils/constants";
+import { LOCAL_STORAGE_KEYS, moves } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { keccak256, parseUnits, encodePacked, toHex } from "viem";
 import { config } from "../config";
@@ -25,6 +25,7 @@ type CreateGameForm = {
 const Create = () => {
   const { isDisconnected, address: p1Address } = useAccount();
   const { deployContractAsync } = useDeployContract();
+
   const [txnHash, setTxnHash] = useState<`0x${string}` | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentGameAddress, setCurrentGameAddress] = useState<
@@ -32,11 +33,13 @@ const Create = () => {
   >(null);
 
   useEffect(() => {
-    const gameAddress = secureLocalStorage.getItem("RPSAddress");
+    const gameAddress = secureLocalStorage.getItem(
+      LOCAL_STORAGE_KEYS.RPS_ADDRESS
+    );
     if (gameAddress) {
       setCurrentGameAddress(gameAddress as `0x${string}`);
     }
-  }, [txnHash]);
+  }, []);
 
   const {
     register,
@@ -48,6 +51,7 @@ const Create = () => {
     defaultValues: { move: 0, stake: 0, player2: "" },
   });
 
+  // TODO: Refractor
   const onSubmit = async (data: CreateGameForm) => {
     if (!p1Address) return;
 
@@ -135,13 +139,18 @@ const Create = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center max-w-lg mx-auto h-screen ">
-        <span className="loading loading-ring loading-lg"></span>
+        <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
   }
 
   if (currentGameAddress) {
-    return <GameStatus gameAddress={currentGameAddress} />;
+    return (
+      <GameStatus
+        gameAddress={currentGameAddress}
+        setCurrentGameAddress={setCurrentGameAddress}
+      />
+    );
   }
 
   return (
@@ -225,8 +234,13 @@ const Create = () => {
           txnHash={txnHash}
           onSuccess={(receipt) => {
             if (receipt?.contractAddress) {
-              secureLocalStorage.setItem("RPSAddress", receipt.contractAddress);
+              const gameAddress = receipt.contractAddress;
+              secureLocalStorage.setItem(
+                LOCAL_STORAGE_KEYS.RPS_ADDRESS,
+                gameAddress
+              );
               setTxnHash(null);
+              setCurrentGameAddress(gameAddress);
             }
           }}
           className="mt-4"

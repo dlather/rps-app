@@ -4,3 +4,9 @@ export const DIALOG_IDS = {
 };
 
 export const moves = ["Rock", "Paper", "Scissors", "Spock", "Lizard"];
+
+export const LOCAL_STORAGE_KEYS = {
+  RPS_ADDRESS: "RPSAddress",
+  CREATE_GAME_CONFIG: "createGameConfig",
+  JOIN_GAME_CONFIG: "joinGameConfig",
+};

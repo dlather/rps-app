@@ -12,13 +12,24 @@ const possibleMoves = [
   "Spock",
   "Lizard",
 ];
+
 type GameStatusProps = {
   gameAddress: `0x${string}`;
+  setCurrentGameAddress: React.Dispatch<
+    React.SetStateAction<`0x${string}` | null>
+  >;
 };
+// TODO: Only refetch player 2 move
+// TODO: Update time left properly
+// TODO: Dont show get stake back when txn in progress
 
-const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
+const GameStatus: React.FC<GameStatusProps> = ({
+  gameAddress,
+  setCurrentGameAddress,
+}) => {
   const { chain } = useAccount();
   const { writeContractAsync } = useWriteContract();
+
   const [txnHash, setTxnHash] = useState<`0x${string}` | null>(null);
   const gameContract = {
     address: gameAddress,
@@ -26,17 +37,33 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
   } as const;
 
   const {
-    data,
-    isRefetching,
-    isLoading: _isLoading,
-    isFetching,
-    error,
+    data: staticData,
+    isRefetching: staticIsRefetching,
+    isLoading: staticIsLoading,
+    isFetching: staticIsFetching,
+    error: staticError,
   } = useReadContracts({
     contracts: [
-      { ...gameContract, functionName: "lastAction" },
       { ...gameContract, functionName: "j2" },
       { ...gameContract, functionName: "TIMEOUT" },
       { ...gameContract, functionName: "stake" },
+    ],
+    query: {
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
+  });
+
+  const {
+    data: dynamicData,
+    isRefetching: dynamicIsRefetching,
+    isLoading: dynamicIsLoading,
+    isFetching: dynamicIsFetching,
+    error: dynamicError,
+  } = useReadContracts({
+    contracts: [
+      { ...gameContract, functionName: "lastAction" },
       { ...gameContract, functionName: "c2" },
     ],
     query: {
@@ -48,14 +75,22 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
     },
   });
 
-  const isLoading = isRefetching || _isLoading || isFetching;
-  const currTime = (Date.now() / 1000).toFixed();
+  const isLoading =
+    staticIsLoading ||
+    dynamicIsLoading ||
+    staticIsFetching ||
+    dynamicIsFetching ||
+    staticIsRefetching ||
+    dynamicIsRefetching;
 
-  // Extract data with type assertions
-  const lastAction = data?.[0]?.result as bigint | undefined;
-  const j2 = data?.[1]?.result as `0x${string}` | undefined;
-  const TIMEOUT = data?.[2]?.result as bigint | undefined;
-  const stake = data?.[3]?.result as bigint | undefined;
+  const data = [...(staticData ?? []), ...(dynamicData ?? [])];
+  const error = staticError || dynamicError;
+
+  const currTime = (Date.now() / 1000).toFixed();
+  const j2 = data?.[0]?.result as `0x${string}` | undefined;
+  const TIMEOUT = data?.[1]?.result as bigint | undefined;
+  const stake = data?.[2]?.result as bigint | undefined;
+  const lastAction = data?.[3]?.result as bigint | undefined;
   const c2 = data?.[4]?.result as number | undefined;
 
   const getStakeBack =
@@ -165,6 +200,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameAddress }) => {
                 secureLocalStorage.removeItem("RPSAddress");
                 secureLocalStorage.removeItem("createGameConfig");
                 setTxnHash(null);
+                setCurrentGameAddress(null);
               }}
             />
           )}
