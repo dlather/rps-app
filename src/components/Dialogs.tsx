@@ -9,14 +9,20 @@ export const NetworkStatusDialog = () => (
   </dialog>
 );
 
-export const WrongChainDialog = ({ onSwitch }: { onSwitch: () => void }) => (
+export const WrongChainDialog = ({
+  onSwitch,
+  network,
+}: {
+  onSwitch: () => void;
+  network: string;
+}) => (
   <dialog id={DIALOG_IDS.WRONG_CHAIN} className="modal">
     <div className="modal-box">
       <h3 className="font-bold text-lg mb-4">
-        Please switch to Sepolia to play
+        Please switch to {network} to play
       </h3>
       <button className="btn btn-primary" onClick={onSwitch}>
-        Switch to Sepolia
+        Switch to {network}
       </button>
     </div>
   </dialog>

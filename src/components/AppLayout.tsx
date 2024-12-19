@@ -6,6 +6,7 @@ import useDialogControl from "../utils/hooks/useDialogControl";
 import useChainConnection from "../utils/hooks/useChainConnection";
 import { WrongChainDialog } from "./Dialogs";
 import { NetworkStatusDialog } from "./Dialogs";
+import { holesky } from "viem/chains";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { isOnline } = useNetworkStatus();
@@ -33,7 +34,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
       {children}
       <NetworkStatusDialog />
-      <WrongChainDialog onSwitch={handleSwitchChain} />
+      <WrongChainDialog onSwitch={handleSwitchChain} network={holesky.name} />
     </div>
   );
 };
