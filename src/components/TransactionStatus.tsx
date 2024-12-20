@@ -7,14 +7,23 @@ type TransactionStatusProps = {
   onSuccess: (receipt: TransactionReceipt) => void;
   className?: string;
 };
-// TODO: seems to be stuck sometimes
+
 const TransactionStatus = ({
   txnHash,
   onSuccess,
   className,
 }: TransactionStatusProps) => {
   const { chain } = useAccount();
-  const { data: receipt } = useTransactionReceipt({ hash: txnHash });
+  const { data: receipt } = useTransactionReceipt({
+    hash: txnHash,
+    query: {
+      refetchInterval: 1000,
+      refetchIntervalInBackground: true,
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
+  });
 
   useEffect(() => {
     if (receipt) {
