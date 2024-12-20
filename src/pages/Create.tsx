@@ -15,6 +15,7 @@ import { generateSalt } from "../utils";
 import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS"; // Adjust the import path as needed
 import TransactionStatus from "../components/TransactionStatus";
 import { useNavigate } from "react-router-dom";
+import { FaCopy, FaTrash } from "react-icons/fa";
 
 type CreateGameForm = {
   move: number;
@@ -29,7 +30,7 @@ const Create = () => {
   const navigate = useNavigate();
 
   const [txnHash, setTxnHash] = useState<`0x${string}` | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentGameAddress, setCurrentGameAddress] = useState<
     `0x${string}` | null
   >(null);
@@ -41,6 +42,7 @@ const Create = () => {
     if (gameAddress) {
       setCurrentGameAddress(gameAddress as `0x${string}`);
     }
+    setIsLoading(false);
   }, []);
 
   const {
@@ -166,24 +168,26 @@ const Create = () => {
           </h1>
           <div className="flex items-center justify-center gap-4">
             <button
-              className="btn btn-primary "
+              className="btn tooltip"
               onClick={() => {
                 navigator.clipboard.writeText(
                   `${window.location.origin}/join/${currentGameAddress}`
                 );
                 toast.success("Invite link copied to clipboard");
               }}
+              title="Copy Invite Link"
+              data-tip="Copy Invite Link"
             >
-              Copy Invite Link
+              <FaCopy className="w-4 h-4" />
             </button>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary w-72"
               onClick={() => navigate(`/join/${currentGameAddress}`)}
             >
               Go to game
             </button>
             <button
-              className="btn btn-error"
+              className="btn tooltip btn-error"
               onClick={() => {
                 secureLocalStorage.removeItem(
                   LOCAL_STORAGE_KEYS.CREATED_RPS_ADDRESS
@@ -191,8 +195,10 @@ const Create = () => {
                 setCurrentGameAddress(null);
                 navigate("/");
               }}
+              title="Delete Game"
+              data-tip="Delete Game"
             >
-              Delete Game
+              <FaTrash className="w-4 h-4 text-white" />
             </button>
           </div>
           <span className="text-white mt-4">
