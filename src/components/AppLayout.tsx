@@ -27,6 +27,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="mx-auto">
       <div className="navbar">
         <div className="flex-1 mx-2">
+          {/* TODO: Navigate to home */}
           <div className="text-xl font-semibold">Let's Play</div>
         </div>
         <div className="flex-none">

@@ -10,6 +10,8 @@ import Home from "./pages/Home";
 import AppLayout from "./components/AppLayout";
 import Join from "./pages/Join";
 import Create from "./pages/Create";
+import NotFound from "./pages/404";
+import Play from "./pages/Play";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/create" element={<Create />} />
+                <Route path="/play/:gameAddress" element={<Play />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </AppLayout>
           </RainbowKitProvider>

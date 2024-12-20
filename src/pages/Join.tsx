@@ -1,14 +1,16 @@
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const Join = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = (data: FieldValues) => {
+    navigate(`/play/${data.gameAddress}`);
   };
 
   return (
@@ -19,21 +21,31 @@ const Join = () => {
             <input
               type="text"
               {...register("gameAddress", {
-                required: true,
-                minLength: 42,
-                maxLength: 42,
-                pattern: /^0x[a-fA-F0-9]{40}$/,
+                required: "Game address is required",
+                minLength: {
+                  value: 42,
+                  message: "Game address is too short",
+                },
+                maxLength: {
+                  value: 42,
+                  message: "Game address is too long",
+                },
+                pattern: {
+                  value: /^0x[a-fA-F0-9]{40}$/,
+                  message: "Invalid game address",
+                },
               })}
               className="grow"
               placeholder="Game Address"
             />
           </label>
+          {errors.gameAddress && (
+            <p className="text-white text-sm mt-1">
+              {errors.gameAddress.message?.toString()}
+            </p>
+          )}
         </div>
-        <button
-          type="submit"
-          disabled={!isValid}
-          className="btn btn-primary mt-4 w-96"
-        >
+        <button type="submit" className="btn btn-primary mt-4 w-96">
           Join
         </button>
       </form>

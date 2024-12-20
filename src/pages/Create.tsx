@@ -1,5 +1,4 @@
 import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useForm } from "react-hook-form";
 import { LOCAL_STORAGE_KEYS, moves } from "../utils/constants";
 import { useEffect, useState } from "react";
@@ -16,6 +15,8 @@ import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS"; // Adjust the impo
 import TransactionStatus from "../components/TransactionStatus";
 import { useNavigate } from "react-router-dom";
 import { FaCopy, FaTrash } from "react-icons/fa";
+import { ConnectWalletDialog } from "../components/Dialogs";
+import Loader from "../components/Loader";
 
 type CreateGameForm = {
   move: number;
@@ -25,7 +26,7 @@ type CreateGameForm = {
 };
 
 const Create = () => {
-  const { isDisconnected, address: p1Address } = useAccount();
+  const { address: p1Address } = useAccount();
   const { deployContractAsync } = useDeployContract();
   const navigate = useNavigate();
 
@@ -82,6 +83,7 @@ const Create = () => {
       const signature = await signMessage(config, {
         message: { raw: messageToSign },
       });
+      console.log("signature", signature);
 
       const hasherMoveHash = keccak256(
         encodePacked(
@@ -89,6 +91,7 @@ const Create = () => {
           [selectedMove + 1, uint8ArrayToBigInt(salt)]
         )
       );
+      console.log("hasherMoveHash", hasherMoveHash);
       const tx = await deployContractAsync(
         {
           abi: RPSAbi,
@@ -105,7 +108,7 @@ const Create = () => {
         }
       );
       // tx is txn hash
-      console.log(tx);
+      console.log("create game txn hash", tx);
       setTxnHash(tx);
 
       const createGameConfig: Record<string, string> = {
@@ -119,10 +122,9 @@ const Create = () => {
         p2Address,
       };
       secureLocalStorage.setItem(
-        "createGameConfig",
+        LOCAL_STORAGE_KEYS.CREATE_GAME_CONFIG,
         JSON.stringify(createGameConfig)
       );
-      // secureLocalStorage.setItem("RPSAddress", contract.address);
     } catch (e) {
       console.log(e);
     } finally {
@@ -132,35 +134,11 @@ const Create = () => {
 
   const selectedMove = watch("move");
 
-  if (isDisconnected)
-    return (
-      <div className="flex flex-col items-center justify-center my-20">
-        <div className="text-lg mb-4 text-white">
-          Please connect your wallet
-        </div>
-        <ConnectButton />
-      </div>
-    );
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center max-w-lg mx-auto h-screen ">
-        <span className="loading loading-spinner loading-lg text-white"></span>
-      </div>
-    );
-  }
-
-  //   if (currentGameAddress) {
-  //     return (
-  //       <GameStatus
-  //         gameAddress={currentGameAddress}
-  //         setCurrentGameAddress={setCurrentGameAddress}
-  //       />
-  //     );
-  //   }
+  if (isLoading) return <Loader />;
 
   return (
     <div>
+      <ConnectWalletDialog />
       {currentGameAddress ? (
         <div className="flex flex-col items-center justify-center my-20">
           <h1 className="text-4xl font-bold text-white mb-8">
@@ -171,7 +149,7 @@ const Create = () => {
               className="btn tooltip"
               onClick={() => {
                 navigator.clipboard.writeText(
-                  `${window.location.origin}/join/${currentGameAddress}`
+                  `${window.location.origin}/play/${currentGameAddress}`
                 );
                 toast.success("Invite link copied to clipboard");
               }}
@@ -182,7 +160,7 @@ const Create = () => {
             </button>
             <button
               className="btn btn-primary w-72"
-              onClick={() => navigate(`/join/${currentGameAddress}`)}
+              onClick={() => navigate(`/play/${currentGameAddress}`)}
             >
               Go to game
             </button>
@@ -211,6 +189,7 @@ const Create = () => {
           <TransactionStatus
             txnHash={txnHash}
             onSuccess={(receipt) => {
+              console.log("receipt", receipt);
               if (receipt?.contractAddress) {
                 const gameAddress = receipt.contractAddress;
                 secureLocalStorage.setItem(

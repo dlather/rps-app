@@ -75,3 +75,8 @@ export function setSecureCookie(name: string, value: string, mins: number) {
   const expires = "expires=" + date.toUTCString();
   document.cookie = `${name}=${value};${expires};path=/;Secure;HttpOnly;SameSite=Strict`;
 }
+
+const movesMapping = ["N/A", "Rock", "Paper", "Scissors", "Spock", "Lizard"];
+export const indexToMove = (index: number) => {
+  return movesMapping[index];
+};

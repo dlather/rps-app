@@ -7,7 +7,7 @@ type TransactionStatusProps = {
   onSuccess: (receipt: TransactionReceipt) => void;
   className?: string;
 };
-
+// TODO: seems to be stuck sometimes
 const TransactionStatus = ({
   txnHash,
   onSuccess,
