@@ -4,16 +4,30 @@ import { useParams } from "react-router-dom";
 import { ConnectWalletDialog } from "../components/Dialogs";
 import { isAddress } from "viem";
 import { useAccount, useReadContracts } from "wagmi";
-import { RPSAbi } from "../utils/contracts/RPS";
+import { RPSAbi, RPSDeployedByteCode } from "../utils/contracts/RPS";
 import Loader from "../components/Loader";
-import { useBalance } from "wagmi";
+import { useBalance, useBytecode } from "wagmi";
 import GameDetails from "../components/GameDetails";
 import Player1Game from "../components/Player1";
 import Player2Game from "../components/Player2";
+import { useState, useEffect } from "react";
 
 const Play = () => {
   const { gameAddress = "" } = useParams();
   const { address: playerAddress } = useAccount();
+  const [isValidGame, setIsValidGame] = useState<boolean | null>(null);
+  const { data: bytecode } = useBytecode({
+    address: gameAddress as `0x${string}`,
+  });
+
+  useEffect(() => {
+    if (bytecode === null) {
+      setIsValidGame(false);
+    } else if (bytecode) {
+      const isValid = bytecode === RPSDeployedByteCode;
+      setIsValidGame(isValid);
+    }
+  }, [bytecode]);
 
   const gameContract = {
     address: gameAddress as `0x${string}`,
@@ -35,7 +49,7 @@ const Play = () => {
       { ...gameContract, functionName: "lastAction" },
     ],
     query: {
-      enabled: isAddress(gameAddress),
+      enabled: isAddress(gameAddress) && isValidGame === true,
       refetchInterval: 2000,
       refetchIntervalInBackground: true,
       refetchOnMount: true,
@@ -58,7 +72,9 @@ const Play = () => {
   const isLoading = gameDataLoading || gameBalanceLoading;
   const error = gameDataError || gameBalanceError;
 
-  if (isLoading) return <Loader />;
+  if (isLoading || isValidGame === null) return <Loader />;
+  if (isValidGame === false)
+    return <div className="text-white">Invalid game</div>;
 
   if (error) {
     return <div>Error : {error.message}</div>;
