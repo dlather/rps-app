@@ -3,9 +3,8 @@ import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "react-toastify";
-import { keccak256, encodePacked } from "viem";
 import { useWriteContract } from "wagmi";
-import { deriveKey, decryptSalt, uint8ArrayToBigInt } from "../utils";
+import { uint8ArrayToBigInt, getGameMoveAndSalt } from "../utils";
 import { LOCAL_STORAGE_KEYS } from "../utils/constants";
 import { RPSAbi } from "../utils/contracts/RPS";
 import { PlayerGameProps } from "../utils/types";
@@ -74,34 +73,10 @@ const Player1Game = ({
   const handleSolve = async (data: FieldValues) => {
     setIsLoading(true);
     try {
-      const createGameConfig = secureLocalStorage.getItem(
-        LOCAL_STORAGE_KEYS.CREATE_GAME_CONFIG
+      const { prevMove, decryptedSalt } = await getGameMoveAndSalt(
+        data.password,
+        c1Hash
       );
-      if (!createGameConfig) throw new Error("No create game config found");
-      const {
-        encryptedSalt: encryptedSaltString,
-        saltForKDF: saltForKDFString,
-      } = JSON.parse(createGameConfig as string);
-      const encryptedSaltData = JSON.parse(encryptedSaltString);
-      const encryptedSalt = new Uint8Array(encryptedSaltData.data);
-      const iv = new Uint8Array(encryptedSaltData.iv);
-      const saltForKDF = new Uint8Array(JSON.parse(saltForKDFString));
-
-      const key = await deriveKey(data.password, saltForKDF);
-      const decryptedSalt = await decryptSalt(encryptedSalt, key, iv);
-      let prevMove = 0;
-      for (let i = 1; i <= 5; i++) {
-        const hasherMoveHash = keccak256(
-          encodePacked(
-            ["uint8", "uint256"],
-            [i, uint8ArrayToBigInt(decryptedSalt)]
-          )
-        );
-        if (hasherMoveHash === c1Hash) {
-          prevMove = i;
-          break;
-        }
-      }
       const sHash = await writeContractAsync({
         ...gameContract,
         functionName: "solve",

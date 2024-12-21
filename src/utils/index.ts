@@ -152,3 +152,47 @@ export const storeCreateGameCreds = (data: {
     JSON.stringify(createGameConfig)
   );
 };
+
+export const getGameMoveAndSalt = async (
+  password: string,
+  c1Hash: `0x${string}`
+) => {
+  const createGameConfig = secureLocalStorage.getItem(
+    LOCAL_STORAGE_KEYS.CREATE_GAME_CONFIG
+  );
+  if (!createGameConfig) throw new Error("No create game config found");
+
+  const { encryptedSalt: encryptedSaltString, saltForKDF: saltForKDFString } =
+    JSON.parse(createGameConfig as string);
+
+  const { data, iv } = JSON.parse(encryptedSaltString);
+  const encryptedSalt = new Uint8Array(data);
+  const saltForKDF = new Uint8Array(JSON.parse(saltForKDFString));
+
+  const key = await deriveKey(password, saltForKDF);
+  const decryptedSalt = await decryptSalt(
+    encryptedSalt,
+    key,
+    new Uint8Array(iv)
+  );
+
+  const prevMove = findPreviousMove(decryptedSalt, c1Hash);
+  if (!prevMove) throw new Error("Could not find matching move");
+
+  return { prevMove, decryptedSalt };
+};
+
+export const findPreviousMove = (
+  decryptedSalt: Uint8Array,
+  c1Hash: `0x${string}`
+): number => {
+  for (let i = 1; i <= 5; i++) {
+    const hasherMoveHash = keccak256(
+      encodePacked(["uint8", "uint256"], [i, uint8ArrayToBigInt(decryptedSalt)])
+    );
+    if (hasherMoveHash === c1Hash) {
+      return i;
+    }
+  }
+  return 0;
+};
