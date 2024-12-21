@@ -7,6 +7,7 @@ import { RPSAbi } from "../utils/contracts/RPS";
 import { PlayerGameProps } from "../utils/types";
 import TransactionStatus from "./TransactionStatus";
 
+// TODO: T1 Timeout
 const Player2Game = ({
   gameAddress,
   c2,

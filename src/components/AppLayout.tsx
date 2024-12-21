@@ -8,11 +8,13 @@ import { WrongChainDialog } from "./Dialogs";
 import { NetworkStatusDialog } from "./Dialogs";
 import { ToastContainer } from "react-toastify";
 import { holesky } from "viem/chains";
+import { Outlet, useNavigate } from "react-router-dom";
 
-const AppLayout = ({ children }: { children: React.ReactNode }) => {
+const AppLayout = () => {
   const { isOnline } = useNetworkStatus();
   const { handleSwitchChain } = useChainConnection();
   const { showModal, closeModal } = useDialogControl(DIALOG_IDS.NETWORK_STATUS);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOnline) {
@@ -27,15 +29,19 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="mx-auto">
       <div className="navbar">
         <div className="flex-1 mx-2">
-          {/* TODO: Navigate to home */}
-          <div className="text-xl font-semibold">Let's Play</div>
+          <div
+            className="text-xl font-semibold cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            Let's Play
+          </div>
         </div>
         <div className="flex-none">
           <ConnectButton />
         </div>
       </div>
       <div className="min-h-screen bg-gradient-to-r from-blue-400 to-indigo-400 flex flex-col items-center justify-center p-4">
-        {children}
+        <Outlet />
       </div>
       <NetworkStatusDialog />
       <WrongChainDialog onSwitch={handleSwitchChain} network={holesky.name} />

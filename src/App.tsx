@@ -27,15 +27,15 @@ function App() {
             })}
             modalSize="compact"
           >
-            <AppLayout>
-              <Routes>
+            <Routes>
+              <Route path="/" element={<AppLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/create" element={<Create />} />
                 <Route path="/play/:gameAddress" element={<Play />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AppLayout>
+              </Route>
+            </Routes>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>

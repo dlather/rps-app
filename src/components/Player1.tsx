@@ -104,8 +104,8 @@ const Player1Game = ({
   };
 
   const resetGame = () => {
-    secureLocalStorage.removeItem(LOCAL_STORAGE_KEYS.CREATE_GAME_CONFIG);
-    secureLocalStorage.removeItem(LOCAL_STORAGE_KEYS.CREATED_RPS_ADDRESS);
+    secureLocalStorage.clear();
+    localStorage.clear();
     navigate("/");
   };
 

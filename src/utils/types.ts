@@ -16,3 +16,18 @@ export type PlayerGameProps = {
   TIMEOUT: bigint;
   lastAction: bigint;
 };
+
+export type HashConfigForMove = {
+  hasherMoveHash: `0x${string}`;
+  signature: `0x${string}`;
+  encryptedSalt: Uint8Array<ArrayBuffer>;
+  iv: Uint8Array<ArrayBuffer>;
+  saltForKDF: Uint8Array<ArrayBuffer>;
+};
+
+export type GameCreationFormData = {
+  move: number;
+  stake: number;
+  p2Address: string;
+  password: string;
+};

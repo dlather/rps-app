@@ -1,3 +1,10 @@
+import { encodePacked, keccak256, toHex } from "viem";
+import { signMessage } from "@wagmi/core";
+import { config } from "../config";
+import { HashConfigForMove } from "./types";
+import secureLocalStorage from "react-secure-storage";
+import { LOCAL_STORAGE_KEYS } from "./constants";
+
 export function generateSalt(length: number) {
   const array = new Uint8Array(length);
   window.crypto.getRandomValues(array);
@@ -79,4 +86,57 @@ export function setSecureCookie(name: string, value: string, mins: number) {
 const movesMapping = ["N/A", "Rock", "Paper", "Scissors", "Spock", "Lizard"];
 export const indexToMove = (index: number) => {
   return movesMapping[index];
+};
+
+export const getHashConfigForMove = async (data: {
+  password: string;
+  move: number;
+}): Promise<HashConfigForMove> => {
+  const { password, move } = data;
+
+  const salt = generateSalt(32);
+  const saltForKDF = generateSalt(16);
+  const key = await deriveKey(password, saltForKDF);
+  const { iv, encryptedSalt } = await encryptSalt(salt, key);
+  const encryptedSaltArray = Array.from(encryptedSalt);
+  const messageToSign = toHex(new Uint8Array(encryptedSaltArray));
+  const signature = await signMessage(config, {
+    message: { raw: messageToSign },
+  });
+  const hasherMoveHash = keccak256(
+    encodePacked(["uint8", "uint256"], [move + 1, uint8ArrayToBigInt(salt)])
+  );
+  return {
+    hasherMoveHash,
+    signature,
+    encryptedSalt,
+    iv,
+    saltForKDF,
+  };
+};
+
+export const storeCreateGameCreds = (data: {
+  signature: string;
+  iv: Uint8Array;
+  encryptedSalt: Uint8Array;
+  saltForKDF: Uint8Array;
+  p1Address: string;
+  p2Address: string;
+}) => {
+  const { signature, iv, encryptedSalt, saltForKDF, p1Address, p2Address } =
+    data;
+  const createGameConfig: Record<string, string> = {
+    signature,
+    encryptedSalt: JSON.stringify({
+      iv: Array.from(iv),
+      data: Array.from(encryptedSalt),
+    }),
+    saltForKDF: JSON.stringify(Array.from(saltForKDF)),
+    p1Address,
+    p2Address,
+  };
+  secureLocalStorage.setItem(
+    LOCAL_STORAGE_KEYS.CREATE_GAME_CONFIG,
+    JSON.stringify(createGameConfig)
+  );
 };

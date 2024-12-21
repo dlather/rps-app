@@ -6,12 +6,14 @@ type TransactionStatusProps = {
   txnHash: `0x${string}`;
   onSuccess: (receipt: TransactionReceipt) => void;
   className?: string;
+  label?: string;
 };
 
 const TransactionStatus = ({
   txnHash,
   onSuccess,
   className,
+  label,
 }: TransactionStatusProps) => {
   const { chain } = useAccount();
   const { data: receipt } = useTransactionReceipt({
@@ -33,8 +35,10 @@ const TransactionStatus = ({
 
   return (
     <div className={className}>
+      <span className="loading loading-spinner loading-md text-white mb-4"></span>
+      {label && <span className="text-white text-2xl">{label}</span>}
       <a
-        className="mt-4 link text-white"
+        className="link text-white text-sm"
         href={`https://${chain?.name}.etherscan.io/tx/${txnHash}`}
         target="_blank"
         rel="noreferrer"

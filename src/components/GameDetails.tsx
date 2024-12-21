@@ -2,6 +2,8 @@ import { useAccount } from "wagmi";
 import { indexToMove } from "../utils";
 import { PlayerGameProps } from "../utils/types";
 import Address from "./Address";
+import { toast } from "react-toastify";
+import { FaShareAlt } from "react-icons/fa";
 
 const GameDetails = (props: PlayerGameProps) => {
   const { gameAddress, j1, j2, c2, stake } = props;
@@ -12,9 +14,11 @@ const GameDetails = (props: PlayerGameProps) => {
 
   return (
     <div className="my-8 w-full max-w-xl mx-auto bg-gradient-to-r from-blue-100 to-purple-100 shadow-lg rounded-lg p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">Game Details</h2>
+        <CopyInviteLink gameAddress={gameAddress} />
       </div>
+      <div className="divider"></div>
 
       <div className="space-y-4">
         <div className="flex justify-between">
@@ -55,6 +59,24 @@ const GameDetails = (props: PlayerGameProps) => {
         )}
       </div>
     </div>
+  );
+};
+
+const CopyInviteLink = ({ gameAddress }: { gameAddress: `0x${string}` }) => {
+  return (
+    <button
+      className="btn tooltip btn-primary"
+      onClick={() => {
+        navigator.clipboard.writeText(
+          `${window.location.origin}/play/${gameAddress}`
+        );
+        toast.success("Invite link copied to clipboard");
+      }}
+      title="Copy Invite Link"
+      data-tip="Copy Invite Link"
+    >
+      <FaShareAlt className="w-4 h-4" />
+    </button>
   );
 };
 
