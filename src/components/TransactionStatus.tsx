@@ -12,7 +12,7 @@ type TransactionStatusProps = {
 const TransactionStatus = ({
   txnHash,
   onSuccess,
-  className,
+  className = "flex flex-col items-center justify-center gap-4",
   label,
 }: TransactionStatusProps) => {
   const { chain } = useAccount();

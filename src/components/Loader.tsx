@@ -6,4 +6,10 @@ const Loader = () => {
   );
 };
 
+export const InLineLoader = () => {
+  return (
+    <span className="loading loading-spinner loading-lg text-white"></span>
+  );
+};
+
 export default Loader;

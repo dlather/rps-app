@@ -29,7 +29,7 @@ const GameDetails = (props: PlayerGameProps) => {
         </div>
 
         <div className="flex justify-between">
-          <span className="font-medium text-gray-700">Amount Staked:</span>
+          <span className="font-medium text-gray-700">Contract Balance:</span>
           <span className="text-gray-900">{`${stake.toString()} wei`}</span>
         </div>
 
@@ -72,7 +72,6 @@ const CopyInviteLink = ({ gameAddress }: { gameAddress: `0x${string}` }) => {
         );
         toast.success("Invite link copied to clipboard");
       }}
-      title="Copy Invite Link"
       data-tip="Copy Invite Link"
     >
       <FaShareAlt className="w-4 h-4" />

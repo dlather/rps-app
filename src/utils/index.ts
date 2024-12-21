@@ -15,26 +15,34 @@ export async function deriveKey(
   password: string | undefined,
   salt: BufferSource
 ) {
-  const enc = new TextEncoder();
-  const keyMaterial = await window.crypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    "PBKDF2",
-    false,
-    ["deriveKey"]
-  );
-  return await window.crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt: salt,
-      iterations: 100000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt", "decrypt"]
-  );
+  if (!password) {
+    throw new Error("Password is required");
+  }
+
+  try {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+      "raw",
+      enc.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveKey"]
+    );
+    return await window.crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: salt,
+        iterations: 100000,
+        hash: "SHA-256",
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  } catch (error) {
+    throw new Error("Failed to derive key: " + (error as Error).message);
+  }
 }
 
 export async function encryptSalt(salt: BufferSource, key: CryptoKey) {
@@ -56,16 +64,20 @@ export async function decryptSalt(
   key: CryptoKey,
   iv: BufferSource
 ) {
-  const decrypted = await window.crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv: iv,
-    },
-    key,
-    encryptedSalt
-  );
+  try {
+    const decrypted = await window.crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      key,
+      encryptedSalt
+    );
 
-  return new Uint8Array(decrypted);
+    return new Uint8Array(decrypted);
+  } catch (error) {
+    throw new Error("Failed to decrypt salt: " + (error as Error).message);
+  }
 }
 
 export function uint8ArrayToBigInt(arr: Uint8Array): bigint {

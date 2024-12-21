@@ -159,7 +159,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
             <span className="text-gray-900">{formatAddress(gameAddress)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-medium text-gray-700">Amount Staked:</span>
+            <span className="font-medium text-gray-700">Contract Balance:</span>
             <span className="text-gray-900">{formatStake(stake)}</span>
           </div>
 

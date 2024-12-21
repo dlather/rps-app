@@ -9,6 +9,8 @@ export const moves = ["Rock", "Paper", "Scissors", "Spock", "Lizard"];
 export const LOCAL_STORAGE_KEYS = {
   CREATED_RPS_ADDRESS: "createdRPSAddress",
   CREATE_TXN_HASH: "createTxnHash",
+  T2_TIMEOUT_TXN_HASH: "t2TimeoutTxnHash",
+  SOLVE_TXN_HASH: "solveTxnHash",
   JOINED_RPS_ADDRESS: "joinedRPSAddress",
   CREATE_GAME_CONFIG: "createGameConfig",
   JOIN_GAME_CONFIG: "joinGameConfig",

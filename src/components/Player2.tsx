@@ -39,7 +39,7 @@ const Player2Game = ({
     const mHash = await writeContractAsync({
       ...gameContract,
       functionName: "play",
-      args: [data.move],
+      args: [data.move + 1],
       value: stake,
     });
     setTxn(mHash);
@@ -48,15 +48,20 @@ const Player2Game = ({
 
   if (txn) {
     return (
+      <TransactionStatus
+        onSuccess={() => {
+          toast.success("Played successfully");
+          setTxn(undefined);
+        }}
+        txnHash={txn}
+      />
+    );
+  }
+
+  if (stake === 0n) {
+    return (
       <div className="flex flex-col items-center justify-center my-20">
-        <span className="loading loading-spinner loading-lg text-white"></span>
-        <TransactionStatus
-          onSuccess={() => {
-            toast.success("Played successfully");
-            setTxn(undefined);
-          }}
-          txnHash={txn}
-        />
+        <h1 className="text-4xl font-bold text-white">Game Over</h1>
       </div>
     );
   }
