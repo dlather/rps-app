@@ -20,9 +20,9 @@ export type PlayerGameProps = {
 export type HashConfigForMove = {
   hasherMoveHash: `0x${string}`;
   signature: `0x${string}`;
-  encryptedSalt: Uint8Array<ArrayBuffer>;
-  iv: Uint8Array<ArrayBuffer>;
-  saltForKDF: Uint8Array<ArrayBuffer>;
+  encryptedSalt: Uint8Array;
+  iv: Uint8Array;
+  saltForKDF: Uint8Array;
 };
 
 export type GameCreationFormData = {
