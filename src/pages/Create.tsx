@@ -5,7 +5,7 @@ import { parseUnits } from "viem";
 import { toast } from "react-toastify";
 import { getHashConfigForMove, storeCreateGameCreds } from "../utils";
 import { useDeployContract } from "wagmi";
-import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS"; // Adjust the import path as needed
+import { RPSAbi, RPSByteCode } from "../utils/contracts/RPS";
 import TransactionStatus from "../components/TransactionStatus";
 import { useNavigate } from "react-router-dom";
 import { ConnectWalletDialog } from "../components/Dialogs";

@@ -13,7 +13,5 @@ export const LOCAL_STORAGE_KEYS = {
   T1_TIMEOUT_TXN_HASH: "t1TimeoutTxnHash",
   SOLVE_TXN_HASH: "solveTxnHash",
   PLAY_TXN_HASH: "playTxnHash",
-  JOINED_RPS_ADDRESS: "joinedRPSAddress",
   CREATE_GAME_CONFIG: "createGameConfig",
-  JOIN_GAME_CONFIG: "joinGameConfig",
 };
