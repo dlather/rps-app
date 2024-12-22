@@ -130,6 +130,16 @@ const Player1Game = ({
     return (
       <div className="flex flex-col items-center justify-center my-20">
         <h1 className="text-4xl font-bold text-white">Game Over</h1>
+        <button
+          className="btn btn-outline text-white w-96 mt-4"
+          onClick={() => {
+            secureLocalStorage.clear();
+            localStorage.clear();
+            navigate("/");
+          }}
+        >
+          Reset
+        </button>
       </div>
     );
   }
