@@ -16,7 +16,9 @@ export async function deriveKey(
   salt: BufferSource
 ) {
   if (!password) {
-    throw new Error("Password is required");
+    const passwordError = new Error("Password is required");
+    passwordError.name = "Password is required";
+    throw passwordError;
   }
 
   try {
@@ -41,7 +43,11 @@ export async function deriveKey(
       ["encrypt", "decrypt"]
     );
   } catch (error) {
-    throw new Error("Failed to derive key: " + (error as Error).message);
+    const deriveKeyError = new Error(
+      "Failed to derive key: " + (error as Error).message
+    );
+    deriveKeyError.name = "Failed to derive key";
+    throw deriveKeyError;
   }
 }
 
@@ -76,7 +82,11 @@ export async function decryptSalt(
 
     return new Uint8Array(decrypted);
   } catch (error) {
-    throw new Error("Failed to decrypt salt: " + (error as Error).message);
+    const decryptSaltError = new Error(
+      "Failed to decrypt salt: " + (error as Error).message
+    );
+    decryptSaltError.name = "Failed to decrypt salt";
+    throw decryptSaltError;
   }
 }
 
@@ -160,7 +170,11 @@ export const getGameMoveAndSalt = async (
   const createGameConfig = secureLocalStorage.getItem(
     LOCAL_STORAGE_KEYS.CREATE_GAME_CONFIG
   );
-  if (!createGameConfig) throw new Error("No create game config found");
+  if (!createGameConfig) {
+    const createGameConfigError = new Error("No create game config found");
+    createGameConfigError.name = "No create game config found";
+    throw createGameConfigError;
+  }
 
   const { encryptedSalt: encryptedSaltString, saltForKDF: saltForKDFString } =
     JSON.parse(createGameConfig as string);
@@ -177,7 +191,11 @@ export const getGameMoveAndSalt = async (
   );
 
   const prevMove = findPreviousMove(decryptedSalt, c1Hash);
-  if (!prevMove) throw new Error("Could not find matching move");
+  if (!prevMove) {
+    const prevMoveError = new Error("Could not find matching move");
+    prevMoveError.name = "Could not find matching move";
+    throw prevMoveError;
+  }
 
   return { prevMove, decryptedSalt };
 };
