@@ -14,7 +14,6 @@ import { FaTrash } from "react-icons/fa";
 import { InLineLoader } from "./Loader";
 
 const Player1Game = ({
-  gameBalance,
   gameAddress,
   c1Hash,
   c2,
@@ -43,8 +42,7 @@ const Player1Game = ({
     return () => clearInterval(interval);
   }, [TIMEOUT, lastAction]);
 
-  const getStakeBack =
-    c2 === 0 && remainingTime < 0 && (gameBalance?.value ?? 0n) > 0n;
+  const getStakeBack = c2 === 0 && remainingTime < 0 && stake > 0n;
 
   const gameContract = {
     address: gameAddress as `0x${string}`,
@@ -107,6 +105,9 @@ const Player1Game = ({
           removeT2TimeoutTxn();
           resetGame();
         }}
+        setTxnHash={(hash) =>
+          hash === null ? removeT2TimeoutTxn() : setT2TimeoutTxn(hash)
+        }
         txnHash={t2TimeoutTxn}
       />
     );
@@ -121,6 +122,9 @@ const Player1Game = ({
           removeSolveTxn();
           resetGame();
         }}
+        setTxnHash={(hash) =>
+          hash === null ? removeSolveTxn() : setSolveTxn(hash)
+        }
         txnHash={solveTxn}
       />
     );
@@ -156,7 +160,7 @@ const Player1Game = ({
           Time remaining: {remainingTime} seconds
         </div>
       )}
-      {c2 !== 0 && remainingTime > 0 && (
+      {c2 !== 0 && (
         <form onSubmit={handleSubmit(handleSolve)}>
           <input
             type="text"

@@ -62,6 +62,7 @@ const Player2Game = ({
       setIsLoading(false);
     }
   };
+
   const selectedMove = watch("move");
 
   const handleJ1Timeout = async () => {
@@ -90,6 +91,9 @@ const Player2Game = ({
           toast.success("Played successfully");
           removePlayTxn();
         }}
+        setTxnHash={(hash) =>
+          hash === null ? removePlayTxn() : setPlayTxn(hash)
+        }
         txnHash={playTxn}
       />
     );
@@ -104,6 +108,9 @@ const Player2Game = ({
           removeT1TimeoutTxn();
           navigate("/");
         }}
+        setTxnHash={(hash) =>
+          hash === null ? removeT1TimeoutTxn() : setT1TimeoutTxn(hash)
+        }
         txnHash={t1TimeoutTxn}
       />
     );
@@ -135,7 +142,7 @@ const Player2Game = ({
             Time remaining: {remainingTime} seconds
           </div>
         )}
-        {remainingTime > 0 && c2 === 0 && (
+        {c2 === 0 && (
           <form onSubmit={handleSubmit(handleMove)}>
             <div className="flex justify-center my-2 gap-4 w-full">
               {moves.map((m, i) => (

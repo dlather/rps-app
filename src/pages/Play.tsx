@@ -34,11 +34,7 @@ const Play = () => {
     abi: RPSAbi,
   } as const;
 
-  const {
-    data,
-    isLoading: gameDataLoading,
-    error: gameDataError,
-  } = useReadContracts({
+  const { data, isLoading, error } = useReadContracts({
     contracts: [
       { ...gameContract, functionName: "j1" },
       { ...gameContract, functionName: "j2" },
@@ -57,20 +53,10 @@ const Play = () => {
       refetchOnReconnect: true,
     },
   });
-  const {
-    data: gameBalance,
-    isLoading: gameBalanceLoading,
-    error: gameBalanceError,
-  } = useBalance({
-    address: gameAddress as `0x${string}`,
-  });
 
   if (!gameAddress || !isAddress(gameAddress)) {
     return <Navigate to="/" />;
   }
-
-  const isLoading = gameDataLoading || gameBalanceLoading;
-  const error = gameDataError || gameBalanceError;
 
   if (isLoading || isValidGame === null) return <Loader />;
   if (isValidGame === false)
@@ -100,7 +86,6 @@ const Play = () => {
 
   const playerProps = {
     gameAddress,
-    gameBalance,
     j1,
     j2,
     c1Hash,

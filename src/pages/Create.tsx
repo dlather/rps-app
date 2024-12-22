@@ -74,6 +74,9 @@ const Create = () => {
       {txnHash ? (
         <TransactionStatus
           txnHash={txnHash}
+          setTxnHash={(hash) =>
+            hash === null ? removeTxn() : setTxnHash(hash)
+          }
           label="Creating Game"
           onSuccess={(receipt) => {
             console.log("receipt", receipt);
