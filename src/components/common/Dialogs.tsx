@@ -1,5 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { DIALOG_IDS } from "../utils/constants";
+import { DIALOG_IDS } from "../../utils/constants";
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
 

@@ -8,10 +8,10 @@ import { uint8ArrayToBigInt, getGameMoveAndSalt } from "../utils";
 import { LOCAL_STORAGE_KEYS } from "../utils/constants";
 import { RPSAbi } from "../utils/contracts/RPS";
 import { PlayerGameProps } from "../utils/types";
-import TransactionStatus from "./TransactionStatus";
+import TransactionStatus from "./common/TransactionStatus";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { FaTrash } from "react-icons/fa";
-import { InLineLoader } from "./Loader";
+import { InLineLoader } from "./common/Loader";
 
 const Player1Game = ({
   gameAddress,

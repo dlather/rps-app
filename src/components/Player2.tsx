@@ -5,9 +5,9 @@ import { useWriteContract } from "wagmi";
 import { LOCAL_STORAGE_KEYS, moves } from "../utils/constants";
 import { RPSAbi } from "../utils/contracts/RPS";
 import { PlayerGameProps } from "../utils/types";
-import TransactionStatus from "./TransactionStatus";
+import TransactionStatus from "./common/TransactionStatus";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
-import { InLineLoader } from "./Loader";
+import { InLineLoader } from "./common/Loader";
 import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 const Player2Game = ({
