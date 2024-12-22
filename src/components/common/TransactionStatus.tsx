@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 import { TransactionReceipt, WaitForTransactionReceiptErrorType } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 
@@ -25,7 +26,8 @@ const TransactionStatus = ({
   } = useWaitForTransactionReceipt({
     hash: txnHash,
     onReplaced: (replaced) => {
-      console.log(`replaced: ${replaced}`);
+      toast.info(`Transaction was replaced`);
+      setTxnHash(replaced?.replacedTransaction?.hash);
     },
     query: {
       refetchInterval: 1000,

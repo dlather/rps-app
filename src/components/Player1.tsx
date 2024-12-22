@@ -6,12 +6,14 @@ import { toast } from "react-toastify";
 import { useWriteContract } from "wagmi";
 import { uint8ArrayToBigInt, getGameMoveAndSalt } from "../utils";
 import { LOCAL_STORAGE_KEYS } from "../utils/constants";
+import { simulateContract } from "@wagmi/core";
 import { RPSAbi } from "../utils/contracts/RPS";
 import { PlayerGameProps } from "../utils/types";
 import TransactionStatus from "./common/TransactionStatus";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { FaTrash } from "react-icons/fa";
 import { InLineLoader } from "./common/Loader";
+import { config } from "../config";
 
 const Player1Game = ({
   gameAddress,
@@ -54,13 +56,18 @@ const Player1Game = ({
   const handleGetStakeBack = async () => {
     setIsLoading(true);
     try {
+      await simulateContract(config, {
+        ...gameContract,
+        functionName: "j2Timeout",
+      });
       const tHash = await writeContractAsync({
         ...gameContract,
         functionName: "j2Timeout",
       });
       setT2TimeoutTxn(tHash);
-    } catch {
-      toast.error("Failed to get stake back");
+    } catch (error) {
+      const errorName = error instanceof Error ? error.name : "Unknown Error";
+      toast.error(`Failed to get stake back: ${errorName}`);
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +82,11 @@ const Player1Game = ({
         data.password,
         c1Hash
       );
+      await simulateContract(config, {
+        ...gameContract,
+        functionName: "solve",
+        args: [prevMove, uint8ArrayToBigInt(decryptedSalt)],
+      });
       const sHash = await writeContractAsync({
         ...gameContract,
         functionName: "solve",
@@ -82,7 +94,8 @@ const Player1Game = ({
       });
       setSolveTxn(sHash);
     } catch (err) {
-      toast.error((err as Error)?.message || "Something went wrong");
+      const errorName = err instanceof Error ? err.name : "Unknown Error";
+      toast.error(`Failed to solve: ${errorName}`);
     } finally {
       setIsLoading(false);
     }

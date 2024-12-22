@@ -10,6 +10,9 @@ import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { InLineLoader } from "./common/Loader";
 import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
+import { simulateContract } from "@wagmi/core";
+import { config } from "../config";
+
 const Player2Game = ({
   gameAddress,
   c2,
@@ -48,6 +51,12 @@ const Player2Game = ({
   const handleMove = async (data: FieldValues) => {
     try {
       setIsLoading(true);
+      await simulateContract(config, {
+        ...gameContract,
+        functionName: "play",
+        args: [data.move + 1],
+        value: stake,
+      });
       const mHash = await writeContractAsync({
         ...gameContract,
         functionName: "play",
@@ -56,8 +65,8 @@ const Player2Game = ({
       });
       setPlayTxn(mHash);
     } catch (error) {
-      console.error(error);
-      toast.error("Error playing");
+      const errorName = error instanceof Error ? error.name : "Unknown Error";
+      toast.error(`Error playing: ${errorName}`);
     } finally {
       setIsLoading(false);
     }
@@ -68,14 +77,18 @@ const Player2Game = ({
   const handleJ1Timeout = async () => {
     try {
       setIsLoading(true);
+      await simulateContract(config, {
+        ...gameContract,
+        functionName: "j1Timeout",
+      });
       const t1TimeoutTxn = await writeContractAsync({
         ...gameContract,
         functionName: "j1Timeout",
       });
       setT1TimeoutTxn(t1TimeoutTxn);
     } catch (error) {
-      console.error(error);
-      toast.error("Error in j1Timeout");
+      const errorName = error instanceof Error ? error.name : "Unknown Error";
+      toast.error(`Error in j1Timeout: ${errorName}`);
     } finally {
       setIsLoading(false);
     }

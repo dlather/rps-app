@@ -6,7 +6,7 @@ import { isAddress } from "viem";
 import { useAccount, useReadContracts } from "wagmi";
 import { RPSAbi, RPSDeployedByteCode } from "../utils/contracts/RPS";
 import Loader from "../components/common/Loader";
-import { useBalance, useBytecode } from "wagmi";
+import { useBytecode } from "wagmi";
 import GameDetails from "../components/GameDetails";
 import Player1Game from "../components/Player1";
 import Player2Game from "../components/Player2";
