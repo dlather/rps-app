@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { moves } from "../utils/constants";
 import { GameCreationFormData } from "../utils/types";
+import ErrorLabel from "./common/ErrorLabel";
 
 const CreateGameForm = ({
   onSubmit,
@@ -12,7 +13,7 @@ const CreateGameForm = ({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<GameCreationFormData>({
     defaultValues: { move: 0, stake: 0, p2Address: "", password: "" },
   });
@@ -44,53 +45,65 @@ const CreateGameForm = ({
             type="number"
             {...register("stake", {
               valueAsNumber: true,
-              required: true,
-              min: 1,
+              required: "Stake is required",
+              min: {
+                value: 1,
+                message: "Stake must be greater than 0",
+              },
             })}
             className="grow"
             placeholder="Enter Amount"
           />
           <kbd className="">wei</kbd>
         </label>
+        {errors.stake && errors.stake.message && (
+          <ErrorLabel message={errors.stake.message} />
+        )}
       </div>
       <div className="my-4">
         <label className="input input-bordered flex items-center w-96">
           <input
             type="text"
             {...register("p2Address", {
-              required: true,
-              minLength: 42,
-              maxLength: 42,
-              pattern: /^0x[a-fA-F0-9]{40}$/,
+              required: "Player 2 Address is required",
+              minLength: {
+                value: 42,
+                message: "Address is too short",
+              },
+              maxLength: {
+                value: 42,
+                message: "Address is too long",
+              },
+              pattern: {
+                value: /^0x[a-fA-F0-9]{40}$/,
+                message: "Invalid Address",
+              },
             })}
             className="grow"
             placeholder="Player 2 Address"
           />
-          <div className="label">
-            {errors.p2Address && (
-              <span className="label-text-alt text-red-600">
-                Invalid Address
-              </span>
-            )}
-          </div>
         </label>
+        {errors.p2Address && errors.p2Address.message && (
+          <ErrorLabel message={errors.p2Address.message} />
+        )}
       </div>
       <div className=" my-4">
         <label className="input input-bordered flex items-center w-96">
           <input
             type="text"
-            {...register("password", { required: true })}
+            {...register("password", {
+              required: "Password is required",
+            })}
             className="grow"
             placeholder="Password"
           />
           <kbd className="">🔑</kbd>
         </label>
+        {errors.password && errors.password.message && (
+          <ErrorLabel message={errors.password.message} />
+        )}
       </div>
-      <button
-        disabled={!isValid}
-        className="btn btn-primary mt-4 w-96"
-        type="submit"
-      >
+      <button className="btn btn-primary mt-4 w-96" type="submit">
         Create Game
       </button>
     </form>

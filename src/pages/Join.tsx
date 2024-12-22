@@ -1,5 +1,6 @@
 import { FieldValues, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import ErrorLabel from "../components/common/ErrorLabel";
 
 const Join = () => {
   const navigate = useNavigate();
@@ -39,10 +40,8 @@ const Join = () => {
               placeholder="Game Address"
             />
           </label>
-          {errors.gameAddress && (
-            <p className="text-white text-sm mt-1">
-              {errors.gameAddress.message?.toString()}
-            </p>
+          {errors.gameAddress && errors.gameAddress.message && (
+            <ErrorLabel message={errors.gameAddress.message.toString()} />
           )}
         </div>
         <button type="submit" className="btn btn-primary mt-4 w-96">
