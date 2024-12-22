@@ -1,7 +1,7 @@
 import { useAccount } from "wagmi";
 import { indexToMove } from "../utils";
 import { PlayerGameProps } from "../utils/types";
-import Address from "./Address";
+import Address from "./common/Address";
 import { toast } from "react-toastify";
 import { FaShareAlt } from "react-icons/fa";
 
