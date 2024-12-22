@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { TransactionReceipt, WaitForTransactionReceiptErrorType } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 
+// NOTE: Estimated time is supported for mainnet only at the moment (https://docs.etherscan.io/etherscan-v2/api-endpoints/gas-tracker)
 type TransactionStatusProps = {
   txnHash: `0x${string}`;
   onSuccess: (receipt: TransactionReceipt) => void;
